@@ -4,8 +4,7 @@
   "description": "Hudu API Wrapper",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "babel src -d dist"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -21,11 +20,6 @@
     "url": "https://github.com/derpenstiltskin/hudu-node/issues"
   },
   "homepage": "https://github.com/derpenstiltskin/hudu-node#readme",
-  "devDependencies": {
-    "@babel/cli": "^7.17.6",
-    "@babel/core": "^7.17.8",
-    "@babel/preset-env": "^7.16.11"
-  },
   "dependencies": {
     "axios": "^0.26.1"
   }
