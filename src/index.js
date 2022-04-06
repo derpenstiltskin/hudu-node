@@ -9,7 +9,7 @@ class Hudu {
         this._apiConfig = {
             uri: apiOptions.uri ? apiOptions.uri : '',
             key: apiOptions.key ? apiOptions.key : '',
-            pageSize: apiOptions.pageSize ? apiOptions.pageSize : 25,
+            pageSize: apiOptions.pageSize ? apiOptions.pageSize : 1000,
         };
 
         this._apiInstance = axios.create({
@@ -430,26 +430,49 @@ class Hudu {
         const requestOptions = {
             method: endpoint.method,
             url: endpoint.resource,
-            params: endpoint.params,
         };
+
+        if (endpoint.params !== null) {
+            requestOptions.params = endpoint.params;
+        }
 
         if (endpoint.body !== null) {
             requestOptions.data = endpoint.body;
         }
 
-        const response = this._apiInstance.request(requestOptions).catch(function (err) {
-            if (err.response) {
-                console.log(err.response.data);
-                console.log(err.response.status);
-                console.log(err.response.headers);
-            } else if (err.request) {
-                console.log(err.request);
-            } else {
-                console.log('Error ', err.message);
-            }
-        });
+        if (requestOptions.method == 'get') {
+            requestOptions.params.page_size = this._apiConfig.pageSize;
+            requestOptions.params.page = 1;
+        }
 
-        return response.data;
+        let processing = true;
+        let responseData = [];
+
+        while (processing) {
+            const response = this._apiInstance.request(requestOptions).catch(function (err) {
+                if (err.response) {
+                    console.log(err.response.data);
+                    console.log(err.response.status);
+                    console.log(err.response.headers);
+                } else if (err.request) {
+                    console.log(err.request);
+                } else {
+                    console.log('Error ', err.message);
+                }
+            });
+
+            if (response.data) {
+                responseData.push.apply(responseData, response.data);
+            }
+
+            if (((response.data[Object.keys(response.data)[0]].length == 0) && (response.data[Object.keys(response.data)[0]].length%1000 == 0)) || (requestOptions.method != 'get')) {
+                processing = false;
+            } else {
+                requestOptions.params.page++;
+            }
+        }
+
+        return responseData;
     }
 
     async activity_logs(method = '', options = {}) {
