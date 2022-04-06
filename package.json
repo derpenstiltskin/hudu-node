@@ -1,0 +1,32 @@
+{
+  "name": "@derpenstiltskin/hudu-node",
+  "version": "0.1.0",
+  "description": "Hudu API Wrapper",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel src -d dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/derpenstiltskin/hudu-node.git"
+  },
+  "keywords": [
+    "hudu",
+    "api"
+  ],
+  "author": "Dustin Riley",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/derpenstiltskin/hudu-node/issues"
+  },
+  "homepage": "https://github.com/derpenstiltskin/hudu-node#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.17.6",
+    "@babel/core": "^7.17.8",
+    "@babel/preset-env": "^7.16.11"
+  },
+  "dependencies": {
+    "axios": "^0.26.1"
+  }
+}
