@@ -5,14 +5,14 @@ import axios from "axios";
 class Hudu {
     constructor() { }
 
-    async init(apiOptions = {}) {
+    init(apiOptions = {}) {
         this._apiConfig = {
             uri: apiOptions.uri ? apiOptions.uri : '',
             key: apiOptions.key ? apiOptions.key : '',
             pageSize: apiOptions.pageSize ? apiOptions.pageSize : 25,
         };
 
-        this._apiInstance = await axios.create({
+        this._apiInstance = axios.create({
             baseURL: this._apiConfig.uri,
             headers: {
                 'x-api-key': this_apiConfig.key,
@@ -50,14 +50,70 @@ class Hudu {
                         body: null,
                     }
                 },
+                create: (options = {}) => {
+                    return {
+                        method: 'post',
+                        resource: '/articles',
+                        params: null,
+                        body: options.body ? options.body : {},
+                    }
+                },
+                update: (options = {}) => {
+                    return {
+                        method: 'put',
+                        resource: `/articles${options.id ? `/${options.id}` : ''}`,
+                        params: null,
+                        body: options.body ? options.body : {},
+                    }
+                },
+                delete: (options = {}) => {
+                    return {
+                        method: 'delete',
+                        resource: `/articles${options.id ? `/${options.id}` : ''}`,
+                        params: null,
+                        body: null,
+                    }
+                },
+                archive: (options = {}) => {
+                    return {
+                        method: 'put',
+                        resource: `/articles${options.id ? `/${options.id}` : ''}/archive`,
+                        params: null,
+                        body: null,
+                    }
+                },
+                unarchive: (options = {}) => {
+                    return {
+                        method: 'put',
+                        resource: `/articles${options.id ? `/${options.id}` : ''}/unarchive`,
+                        params: null,
+                        body: null,
+                    }
+                },
             },
             asset_layouts: {
                 get: (options = {}) => {
                     return {
-                        method: 'get',
+                        method: 'put',
                         resource: `/asset_layouts${options.id ? `/${options.id}` : ''}`,
                         params: options.params ? options.params : {},
                         body: null,
+                    }
+                },
+                create: (options = {}) => {
+                    return {
+                        method: 'post',
+                        resource: '/asset_layouts',
+                        params: null,
+                        body: options.body ? options.body : {},
+                    }
+                },
+                update: (options = {}) => {
+                    return {
+                        method: 'put',
+                        resource: `/asset_layouts${options.id ? `/${options.id}` : ''}`,
+                        params: null,
+                        body: options.body ? options.body : {},
                     }
                 },
             },
@@ -67,6 +123,46 @@ class Hudu {
                         method: 'get',
                         resource: `/asset_passwords${options.id ? `/${options.id}` : ''}`,
                         params: options.params ? options.params : {},
+                        body: null,
+                    }
+                },
+                create: (options = {}) => {
+                    return {
+                        method: 'post',
+                        resource: '/asset_passwords',
+                        params: null,
+                        body: options.body ? options.body : {},
+                    }
+                },
+                update: (options = {}) => {
+                    return {
+                        method: 'put',
+                        resource: `/asset_passwords${options.id ? `/${options.id}` : ''}`,
+                        params: null,
+                        body: options.body ? options.body : {},
+                    }
+                },
+                delete: (options = {}) => {
+                    return {
+                        method: 'delete',
+                        resource: `/asset_passwords${options.id ? `/${options.id}` : ''}`,
+                        params: null,
+                        body: null,
+                    }
+                },
+                archive: (options = {}) => {
+                    return {
+                        method: 'put',
+                        resource: `/asset_passwords${options.id ? `/${options.id}` : ''}/archive`,
+                        params: null,
+                        body: null,
+                    }
+                },
+                unarchive: (options = {}) => {
+                    return {
+                        method: 'put',
+                        resource: `/asset_passwords${options.id ? `/${options.id}` : ''}/unarchive`,
+                        params: null,
                         body: null,
                     }
                 },
@@ -80,6 +176,54 @@ class Hudu {
                         body: null,
                     }
                 },
+                getCompanyAssets: (options = {}) => {
+                    return {
+                        method: 'get',
+                        resource: `/companies${options.id ? `/${options.id}/assets` : '/assets'}`,
+                        params: options.params ? options.params : {},
+                        body: null,
+                    }
+                },
+                create: (options = {}) => {
+                    return {
+                        method: 'post',
+                        resource: `/companies${options.company_id ? `/${options.company_id}` : ''}/assets`,
+                        params: null,
+                        body: options.body ? options.body : {},
+                    }
+                },
+                update: (options = {}) => {
+                    return {
+                        method: 'put',
+                        resource: `/companies${options.company_id ? `/${options.company_id}` : ''}/assets${options.id ? `/${options.id}` : ''}`,
+                        params: null,
+                        body: options.body ? options.body : {},
+                    }
+                },
+                delete: (options = {}) => {
+                    return {
+                        method: 'delete',
+                        resource: `/companies${options.company_id ? `/${options.company_id}` : ''}/assets${options.id ? `/${options.id}` : ''}`,
+                        params: null,
+                        body: null,
+                    }
+                },
+                archive: (options = {}) => {
+                    return {
+                        method: 'put',
+                        resource: `/companies${options.company_id ? `/${options.company_id}` : ''}/assets${options.id ? `/${options.id}` : ''}/archive`,
+                        params: null,
+                        body: null,
+                    }
+                },
+                unarchive: (options = {}) => {
+                    return {
+                        method: 'put',
+                        resource: `/companies${options.company_id ? `/${options.company_id}` : ''}/assets${options.id ? `/${options.id}` : ''}/unarchive`,
+                        params: null,
+                        body: null,
+                    }
+                },
             },
             companies: {
                 get: (options = {}) => {
@@ -87,6 +231,46 @@ class Hudu {
                         method: 'get',
                         resource: `/companies${options.id ? `/${options.id}` : ''}`,
                         params: options.params ? options.params : {},
+                        body: null,
+                    }
+                },
+                create: (options = {}) => {
+                    return {
+                        method: 'post',
+                        resource: '/companies',
+                        params: null,
+                        body: options.body ? options.body : {},
+                    }
+                },
+                update: (options = {}) => {
+                    return {
+                        method: 'put',
+                        resource: `/companies${options.id ? `/${options.id}` : ''}`,
+                        params: null,
+                        body: options.body ? options.body : {},
+                    }
+                },
+                delete: (options = {}) => {
+                    return {
+                        method: 'delete',
+                        resource: `/companies${options.id ? `/${options.id}` : ''}`,
+                        params: null,
+                        body: null,
+                    }
+                },
+                archive: (options = {}) => {
+                    return {
+                        method: 'put',
+                        resource: `/companies${options.id ? `/${options.id}` : ''}/archive`,
+                        params: null,
+                        body: null,
+                    }
+                },
+                unarchive: (options = {}) => {
+                    return {
+                        method: 'put',
+                        resource: `/companies${options.id ? `/${options.id}` : ''}/unarchive`,
+                        params: null,
                         body: null,
                     }
                 },
@@ -110,6 +294,30 @@ class Hudu {
                         body: null,
                     }
                 },
+                create: (options = {}) => {
+                    return {
+                        method: 'post',
+                        resource: '/folders',
+                        params: null,
+                        body: options.body ? options.body : {},
+                    }
+                },
+                update: (options = {}) => {
+                    return {
+                        method: 'put',
+                        resource: `/folders${options.id ? `/${options.id}` : ''}`,
+                        params: null,
+                        body: options.body ? options.body : {},
+                    }
+                },
+                delete: (options = {}) => {
+                    return {
+                        method: 'delete',
+                        resource: `/folders${options.id ? `/${options.id}` : ''}`,
+                        params: null,
+                        body: null,
+                    }
+                },
             },
             magic_dash: {
                 get: (options = {}) => {
@@ -118,6 +326,30 @@ class Hudu {
                         resource: '/magic_dash',
                         params: options.params ? options.params : {},
                         body: null,
+                    }
+                },
+                create: (options = {}) => {
+                    return {
+                        method: 'post',
+                        resource: '/magic_dash',
+                        params: null,
+                        body: options.body ? options.body : {},
+                    }
+                },
+                update: (options = {}) => {
+                    return {
+                        method: 'post',
+                        resource: '/magic_dash',
+                        params: null,
+                        body: options.body ? options.body : {},
+                    }
+                },
+                delete: (options = {}) => {
+                    return {
+                        method: 'delete',
+                        resource: `/magic_dash${options.id ? `/${options.id}` : ''}`,
+                        params: null,
+                        body: options.body ? options.body : {},
                     }
                 },
             },
@@ -140,6 +372,22 @@ class Hudu {
                         body: null,
                     }
                 },
+                create: (options = {}) => {
+                    return {
+                        method: 'post',
+                        resource: '/relations',
+                        params: null,
+                        body: options.body ? options.body : {},
+                    }
+                },
+                delete: (options = {}) => {
+                    return {
+                        method: 'delete',
+                        resource: `/relations${options.id ? `/${options.id}` : ''}`,
+                        params: null,
+                        body: options.body ? options.body : {},
+                    }
+                },
             },
             websites: {
                 get: (options = {}) => {
@@ -150,11 +398,35 @@ class Hudu {
                         body: null,
                     }
                 },
+                create: (options = {}) => {
+                    return {
+                        method: 'post',
+                        resource: '/websites',
+                        params: null,
+                        body: options.body ? options.body : {},
+                    }
+                },
+                update: (options = {}) => {
+                    return {
+                        method: 'put',
+                        resource: `/websites${options.id ? `/${options.id}` : ''}`,
+                        params: null,
+                        body: options.body ? options.body : {},
+                    }
+                },
+                delete: (options = {}) => {
+                    return {
+                        method: 'delete',
+                        resource: `/websites${options.id ? `/${options.id}` : ''}`,
+                        params: null,
+                        body: null,
+                    }
+                },
             },
         };
     }
 
-    async request(endpoint = {}) {
+    request(endpoint = {}) {
         const requestOptions = {
             method: endpoint.method,
             url: endpoint.resource,
@@ -165,7 +437,7 @@ class Hudu {
             requestOptions.data = endpoint.body;
         }
 
-        const response = await this._apiInstance.request(requestOptions).catch(function (err) {
+        const response = this._apiInstance.request(requestOptions).catch(function (err) {
             if (err.response) {
                 console.log(err.response.data);
                 console.log(err.response.status);
@@ -185,7 +457,7 @@ class Hudu {
 
         if (existingEndpoint) {
             const endpoint = existingEndpoint(options);
-            return await this.request(endpoint);
+            return this.request(endpoint);
         }
     }
 
@@ -194,7 +466,7 @@ class Hudu {
 
         if (existingEndpoint) {
             const endpoint = existingEndpoint(options);
-            return await this.request(endpoint);
+            return this.request(endpoint);
         }
     }
 
@@ -203,7 +475,7 @@ class Hudu {
 
         if (existingEndpoint) {
             const endpoint = existingEndpoint(options);
-            return await this.request(endpoint);
+            return this.request(endpoint);
         }
     }
 
@@ -212,7 +484,7 @@ class Hudu {
 
         if (existingEndpoint) {
             const endpoint = existingEndpoint(options);
-            return await this.request(endpoint);
+            return this.request(endpoint);
         }
     }
 
@@ -221,7 +493,7 @@ class Hudu {
 
         if (existingEndpoint) {
             const endpoint = existingEndpoint(options);
-            return await this.request(endpoint);
+            return this.request(endpoint);
         }
     }
 
@@ -230,7 +502,7 @@ class Hudu {
 
         if (existingEndpoint) {
             const endpoint = existingEndpoint(options);
-            return await this.request(endpoint);
+            return this.request(endpoint);
         }
     }
 
@@ -239,7 +511,7 @@ class Hudu {
 
         if (existingEndpoint) {
             const endpoint = existingEndpoint(options);
-            return await this.request(endpoint);
+            return this.request(endpoint);
         }
     }
 
@@ -248,7 +520,7 @@ class Hudu {
 
         if (existingEndpoint) {
             const endpoint = existingEndpoint(options);
-            return await this.request(endpoint);
+            return this.request(endpoint);
         }
     }
 
@@ -257,7 +529,7 @@ class Hudu {
 
         if (existingEndpoint) {
             const endpoint = existingEndpoint(options);
-            return await this.request(endpoint);
+            return this.request(endpoint);
         }
     }
 
@@ -266,7 +538,7 @@ class Hudu {
 
         if (existingEndpoint) {
             const endpoint = existingEndpoint(options);
-            return await this.request(endpoint);
+            return this.request(endpoint);
         }
     }
 
@@ -275,7 +547,7 @@ class Hudu {
 
         if (existingEndpoint) {
             const endpoint = existingEndpoint(options);
-            return await this.request(endpoint);
+            return this.request(endpoint);
         }
     }
 
@@ -284,7 +556,7 @@ class Hudu {
 
         if (existingEndpoint) {
             const endpoint = existingEndpoint(options);
-            return await this.request(endpoint);
+            return this.request(endpoint);
         }
     }
 
@@ -293,7 +565,7 @@ class Hudu {
 
         if (existingEndpoint) {
             const endpoint = existingEndpoint(options);
-            return await this.request(endpoint);
+            return this.request(endpoint);
         }
     }
 }
