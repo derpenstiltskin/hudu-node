@@ -1,21 +1,20 @@
 'use strict';
 
-const axios = require('axios');
+import axios from "axios";
 
 class Hudu {
     constructor() { }
 
     init(apiOptions = {}) {
         this._apiConfig = {
-            uri: apiOptions.uri ? apiOptions.uri : '',
+            uri: apiOptions.uri ? `https://${apiOptions.uri}/api/v1` : '',
             key: apiOptions.key ? apiOptions.key : '',
-            pageSize: apiOptions.pageSize ? apiOptions.pageSize : 1000,
         };
 
         this._apiInstance = axios.create({
             baseURL: this._apiConfig.uri,
             headers: {
-                'x-api-key': this_apiConfig.key,
+                'x-api-key': this._apiConfig.key,
                 'Content-Type': 'application/json',
             },
         });
@@ -94,7 +93,7 @@ class Hudu {
             asset_layouts: {
                 get: (options = {}) => {
                     return {
-                        method: 'put',
+                        method: 'get',
                         resource: `/asset_layouts${options.id ? `/${options.id}` : ''}`,
                         params: options.params ? options.params : {},
                         body: null,
@@ -426,7 +425,7 @@ class Hudu {
         };
     }
 
-    request(endpoint = {}) {
+    async _request(endpoint = {}) {
         const requestOptions = {
             method: endpoint.method,
             url: endpoint.resource,
@@ -439,157 +438,72 @@ class Hudu {
         if (endpoint.body !== null) {
             requestOptions.data = endpoint.body;
         }
-
-        if (requestOptions.method == 'get') {
-            requestOptions.params.page_size = this._apiConfig.pageSize;
-            requestOptions.params.page = 1;
-        }
-
-        let processing = true;
-        let responseData = [];
-
-        while (processing) {
-            const response = this._apiInstance.request(requestOptions).catch(function (err) {
-                if (err.response) {
-                    console.log(err.response.data);
-                    console.log(err.response.status);
-                    console.log(err.response.headers);
-                } else if (err.request) {
-                    console.log(err.request);
-                } else {
-                    console.log('Error ', err.message);
-                }
-            });
-
-            if (response.data) {
-                responseData.push.apply(responseData, response.data);
-            }
-
-            if (((response.data[Object.keys(response.data)[0]].length == 0) && (response.data[Object.keys(response.data)[0]].length%1000 == 0)) || (requestOptions.method != 'get')) {
-                processing = false;
+        
+        const response = await this._apiInstance.request(requestOptions).catch(function (err) {
+            if (err.response) {
+                console.log(err.response.data);
+                console.log(err.response.status);
+                console.log(err.response.headers);
+            } else if (err.request) {
+                console.log(err.request);
             } else {
-                requestOptions.params.page++;
+                console.log('Error ', err.message);
             }
-        }
-
-        return responseData;
+        });
+            
+        return (response.data ? response.data : {});
     }
 
     async activity_logs(method = '', options = {}) {
-        const existingEndpoint = this._endpoints.activity_logs[method];
-
-        if (existingEndpoint) {
-            const endpoint = existingEndpoint(options);
-            return this.request(endpoint);
-        }
+        return (this._endpoints.activity_logs[method] ? this._request(this._endpoints.activity_logs[method](options)) : {});
     }
 
     async api_info(method = '', options = {}) {
-        const existingEndpoint = this._endpoints.api_info[method];
-
-        if (existingEndpoint) {
-            const endpoint = existingEndpoint(options);
-            return this.request(endpoint);
-        }
+        return (this._endpoints.api_info[method] ? this._request(this._endpoints.api_info[method](options)) : {});
     }
 
     async articles(method = '', options = {}) {
-        const existingEndpoint = this._endpoints.articles[method];
-
-        if (existingEndpoint) {
-            const endpoint = existingEndpoint(options);
-            return this.request(endpoint);
-        }
+        return (this._endpoints.articles[method] ? this._request(this._endpoints.articles[method](options)) : {});
     }
 
     async asset_layouts(method = '', options = {}) {
-        const existingEndpoint = this._endpoints.asset_layouts[method];
-
-        if (existingEndpoint) {
-            const endpoint = existingEndpoint(options);
-            return this.request(endpoint);
-        }
+        return (this._endpoints.asset_layouts[method] ? this._request(this._endpoints.asset_layouts[method](options)) : {});
     }
 
     async asset_passwords(method = '', options = {}) {
-        const existingEndpoint = this._endpoints.asset_passwords[method];
-
-        if (existingEndpoint) {
-            const endpoint = existingEndpoint(options);
-            return this.request(endpoint);
-        }
+        return (this._endpoints.asset_passwords[method] ? this._request(this._endpoints.asset_passwords[method](options)) : {});
     }
 
     async assets(method = '', options = {}) {
-        const existingEndpoint = this._endpoints.assets[method];
-
-        if (existingEndpoint) {
-            const endpoint = existingEndpoint(options);
-            return this.request(endpoint);
-        }
+        return (this._endpoints.assets[method] ? this._request(this._endpoints.assets[method](options)) : {});
     }
 
     async companies(method = '', options = {}) {
-        const existingEndpoint = this._endpoints.expirations[method];
-
-        if (existingEndpoint) {
-            const endpoint = existingEndpoint(options);
-            return this.request(endpoint);
-        }
+        return (this._endpoints.companies[method] ? this._request(this._endpoints.companies[method](options)) : {});
     }
 
     async expirations(method = '', options = {}) {
-        const existingEndpoint = this._endpoints.expirations[method];
-
-        if (existingEndpoint) {
-            const endpoint = existingEndpoint(options);
-            return this.request(endpoint);
-        }
+        return (this._endpoints.expirations[method] ? this._request(this._endpoints.expirations[method](options)) : {});
     }
 
     async folders(method = '', options = {}) {
-        const existingEndpoint = this._endpoints.folders[method];
-
-        if (existingEndpoint) {
-            const endpoint = existingEndpoint(options);
-            return this.request(endpoint);
-        }
+        return (this._endpoints.folders[method] ? this._request(this._endpoints.folders[method](options)) : {});
     }
 
     async magic_dash(method = '', options = {}) {
-        const existingEndpoint = this._endpoints.magic_dash[method];
-
-        if (existingEndpoint) {
-            const endpoint = existingEndpoint(options);
-            return this.request(endpoint);
-        }
+        return (this._endpoints.magic_dash[method] ? this._request(this._endpoints.magic_dash[method](options)) : {});
     }
 
     async procedures(method = '', options = {}) {
-        const existingEndpoint = this._endpoints.relations[method];
-
-        if (existingEndpoint) {
-            const endpoint = existingEndpoint(options);
-            return this.request(endpoint);
-        }
+        return (this._endpoints.procedures[method] ? this._request(this._endpoints.procedures[method](options)) : {});
     }
 
     async relations(method = '', options = {}) {
-        const existingEndpoint = this._endpoints.relations[method];
-
-        if (existingEndpoint) {
-            const endpoint = existingEndpoint(options);
-            return this.request(endpoint);
-        }
+        return (this._endpoints.relations[method] ? this._request(this._endpoints.relations[method](options)) : {});
     }
 
     async websites(method = '', options = {}) {
-        const existingEndpoint = this._endpoints.websites[method];
-
-        if (existingEndpoint) {
-            const endpoint = existingEndpoint(options);
-            return this.request(endpoint);
-        }
+        return (this._endpoints.websites[method] ? this._request(this._endpoints.websites[method](options)) : {});
     }
 }
 
