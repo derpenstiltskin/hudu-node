@@ -5,7 +5,7 @@ import axios from "axios";
 class Hudu {
     constructor() { }
 
-    init(apiOptions = {}) {
+    async init(apiOptions = {}) {
         this._apiConfig = {
             uri: apiOptions.uri ? `https://${apiOptions.uri}/api/v1` : '',
             key: apiOptions.key ? apiOptions.key : '',
