@@ -1,11 +1,10 @@
 'use strict';
 
+import https from "https";
 import axios from "axios";
 
 class Hudu {
-    constructor() { }
-
-    async init(apiOptions = {}) {
+    constructor(apiOptions = {}) {
         this._apiConfig = {
             uri: apiOptions.uri ? `https://${apiOptions.uri}/api/v1` : '',
             key: apiOptions.key ? apiOptions.key : '',
@@ -19,7 +18,7 @@ class Hudu {
             },
         });
 
-        this._endpoints = {
+        this._apiEndpoints = {
             activity_logs: {
                 get: (options = {}) => {
                     return {
@@ -425,7 +424,11 @@ class Hudu {
         };
     }
 
-    async _request(endpoint = {}) {
+    async _sendApiRequest(endpoint = {}) {
+        const request = https.request({
+
+        });
+        
         const requestOptions = {
             method: endpoint.method,
             url: endpoint.resource,
@@ -455,56 +458,56 @@ class Hudu {
     }
 
     async activity_logs(method = '', options = {}) {
-        return (this._endpoints.activity_logs[method] ? this._request(this._endpoints.activity_logs[method](options)) : {});
+        return (this._apiEndpoints.activity_logs[method] ? this._sendApiRequest(this._apiEndpoints.activity_logs[method](options)) : {});
     }
 
     async api_info(method = '', options = {}) {
-        return (this._endpoints.api_info[method] ? this._request(this._endpoints.api_info[method](options)) : {});
+        return (this._apiEndpoints.api_info[method] ? this._sendApiRequest(this._apiEndpoints.api_info[method](options)) : {});
     }
 
     async articles(method = '', options = {}) {
-        return (this._endpoints.articles[method] ? this._request(this._endpoints.articles[method](options)) : {});
+        return (this._apiEndpoints.articles[method] ? this._sendApiRequest(this._apiEndpoints.articles[method](options)) : {});
     }
 
     async asset_layouts(method = '', options = {}) {
-        return (this._endpoints.asset_layouts[method] ? this._request(this._endpoints.asset_layouts[method](options)) : {});
+        return (this._apiEndpoints.asset_layouts[method] ? this._sendApiRequest(this._apiEndpoints.asset_layouts[method](options)) : {});
     }
 
     async asset_passwords(method = '', options = {}) {
-        return (this._endpoints.asset_passwords[method] ? this._request(this._endpoints.asset_passwords[method](options)) : {});
+        return (this._apiEndpoints.asset_passwords[method] ? this._sendApiRequest(this._apiEndpoints.asset_passwords[method](options)) : {});
     }
 
     async assets(method = '', options = {}) {
-        return (this._endpoints.assets[method] ? this._request(this._endpoints.assets[method](options)) : {});
+        return (this._apiEndpoints.assets[method] ? this._sendApiRequest(this._apiEndpoints.assets[method](options)) : {});
     }
 
     async companies(method = '', options = {}) {
-        return (this._endpoints.companies[method] ? this._request(this._endpoints.companies[method](options)) : {});
+        return (this._apiEndpoints.companies[method] ? this._sendApiRequest(this._apiEndpoints.companies[method](options)) : {});
     }
 
     async expirations(method = '', options = {}) {
-        return (this._endpoints.expirations[method] ? this._request(this._endpoints.expirations[method](options)) : {});
+        return (this._apiEndpoints.expirations[method] ? this._sendApiRequest(this._apiEndpoints.expirations[method](options)) : {});
     }
 
     async folders(method = '', options = {}) {
-        return (this._endpoints.folders[method] ? this._request(this._endpoints.folders[method](options)) : {});
+        return (this._apiEndpoints.folders[method] ? this._sendApiRequest(this._apiEndpoints.folders[method](options)) : {});
     }
 
     async magic_dash(method = '', options = {}) {
-        return (this._endpoints.magic_dash[method] ? this._request(this._endpoints.magic_dash[method](options)) : {});
+        return (this._apiEndpoints.magic_dash[method] ? this._sendApiRequest(this._apiEndpoints.magic_dash[method](options)) : {});
     }
 
     async procedures(method = '', options = {}) {
-        return (this._endpoints.procedures[method] ? this._request(this._endpoints.procedures[method](options)) : {});
+        return (this._apiEndpoints.procedures[method] ? this._sendApiRequest(this._apiEndpoints.procedures[method](options)) : {});
     }
 
     async relations(method = '', options = {}) {
-        return (this._endpoints.relations[method] ? this._request(this._endpoints.relations[method](options)) : {});
+        return (this._apiEndpoints.relations[method] ? this._sendApiRequest(this._apiEndpoints.relations[method](options)) : {});
     }
 
     async websites(method = '', options = {}) {
-        return (this._endpoints.websites[method] ? this._request(this._endpoints.websites[method](options)) : {});
+        return (this._apiEndpoints.websites[method] ? this._sendApiRequest(this._apiEndpoints.websites[method](options)) : {});
     }
 }
 
-export default new Hudu;
+export default Hudu;
