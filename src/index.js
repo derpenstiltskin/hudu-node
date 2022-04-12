@@ -2,10 +2,24 @@
 
 import https from 'https';
 
+const HUDU_DEFAULT_PORT = '443';
+const HUDU_BASE_PATH = '/api/v1/';
+
+const HUDU_CONFIG_PROPERTIES = [
+    'host',
+    'key',
+    'port',
+];
+
 class Hudu {
     constructor(apiOptions = {}) {
-        this._apiHost = apiOptions.host ? apiOptions.host : '';
-        this._apiKey = apiOptions.key ? apiOptions.key : '';
+        const validApiOptions = this._validateApiOptions(apiOptions);
+
+        this._api = {
+            host: validApiOptions.host,
+            key: validApiOptions.key,
+            port: validApiOptions.port || HUDU_DEFAULT_PORT,
+        };
 
         this._apiEndpoints = {
             activity_logs: {
@@ -481,6 +495,30 @@ class Hudu {
         };
     }
 
+    _validateApiOptions(apiOptions = {}) {
+        const isObject = apiOptions === Object(apiOptions) && !Array.isArray(apiOptions);
+
+        if (!isObject) {
+            throw new Error('API Config must be an object');
+        }
+
+        const values = Object.keys(apiOptions).filter((value) => !HUDU_CONFIG_PROPERTIES.includes(value));
+
+        if (values.length > 0) {
+            throw new Error (`API Config may only contain the following: ${HUDU_CONFIG_PROPERTIES.join(', ')}`);
+        }
+
+        if (!apiOptions.host) {
+            throw new Error('API Config must contain host value');
+        }
+
+        if (!apiOptions.key) {
+            throw new Error('API Config must contain key value');
+        }
+
+        return apiOptions;
+    }
+
     _sendApiRequest(endpoint = {}) {
         const self = this;
 
@@ -494,11 +532,12 @@ class Hudu {
             }
 
             const reqConfig = {
-                host: self._apiHost,
-                path: `/api/v1/${endpoint.resource}${queryString}`,
+                host: self._api.host,
+                path: `${HUDU_BASE_PATH}${endpoint.resource}${queryString}`,
+                port: self._api.port || HUDU_DEFAULT_PORT,
                 method: endpoint.method,
                 headers: {
-                    'x-api-key': self._apiKey,
+                    'x-api-key': self._api.key,
                     'Content-Type': 'application/json',
                 },
             };
