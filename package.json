@@ -49,9 +49,6 @@
     "nock": "^13.2.4",
     "prettier": "^2.6.2"
   },
-  "dependencies": {
-    "axios": "^0.26.1"
-  },
   "files": [
     "dist/"
   ]
