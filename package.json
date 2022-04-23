@@ -8,7 +8,9 @@
     "lint": "eslint src/ test/",
     "mocha": "mocha --config=test/.mocharc.cjs",
     "test": "npm run lint && npm run mocha",
-    "generate-docs": "jsdoc -c jsdocs.json"
+    "jsdoc": "jsdoc -c jsdocs.json",
+    "jsdoc2md": "jsdoc2md src/*.js > docs/index.md",
+    "docs": "npm run jsdoc && npm run jsdoc2md"
   },
   "repository": {
     "type": "git",
@@ -34,6 +36,7 @@
     "chai-as-promised": "^7.1.1",
     "nock": "^13.2.4",
     "prettier": "^2.6.2",
-    "jsdoc": "~3.6.10"
+    "jsdoc": "~3.6.10",
+    "jsdoc-to-markdown": "^7.1.1"
   }
 }
