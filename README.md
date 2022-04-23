@@ -1,4 +1,4 @@
-# Hudu API Node.js Library
+# Hudu REST API Node.js Library
 
 Unofficial Node.js library for [Hudu](https://hudu.com)'s REST API.
 
@@ -20,21 +20,6 @@ In the API section of your Hudu Admin, you need to generate an API key to use.
 
 ## Usage
 
-CommonJS:
-```
-const Hudu = require('hudu-node');
-const huduInst = new Hudu({
-    host: 'example.com',
-    key: 'abcdefghijklmnopqrstuvwxyz',
-});
-
-huduInst.companies('get', {
-    id: 1,
-})
-    .then(company => console.log(company));
-```
-
-EJS:
 ```
 import Hudu from 'hudu-node';
 const HuduInst = new Hudu({
@@ -42,12 +27,8 @@ const HuduInst = new Hudu({
     key: 'abcdefghijklmnopqrstuvwxyz',
 });
 
-(async () => {
-    const company = await huduInst.companies('get', {
-        id: 1,
-    });
-
-    console.log(company);
+const company = await huduInst.companies('get', {
+    id: 1,
 });
 ```
 
