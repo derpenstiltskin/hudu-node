@@ -1,9 +1,12 @@
 {
   "name": "@derpenstiltskin/hudu-node",
   "version": "0.1.0",
-  "description": "Hudu API Wrapper",
+  "description": "Node.js library for the Hudu API",
   "type": "module",
   "main": "./src/index.js",
+  "engines": {
+    "node": ">=16.*"
+  },
   "scripts": {
     "lint": "eslint src/ test/",
     "mocha": "mocha --config=test/.mocharc.cjs",
