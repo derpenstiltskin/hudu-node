@@ -544,19 +544,94 @@ class Hudu {
             throw new Error('config must contain key value');
         }
 
+        if (config.params) {
+            const isParamsObject = config.params === Object(config.params) && !Array.isArray(config.params);
+
+            if (!isParamsObject) {
+                throw new Error('config.params must be an object');
+            }
+        }
+
+        if (config.body) {
+            const isBodyObject = config.body === Object(config.body) && !Array.isArray(config.body);
+
+            if (!isBodyObject) {
+                throw new Error('config.body must be an object');
+            }
+        }
+
         return config;
     }
 
     /**
-     * Validate the options object for the API request
+     * Validate the parameters sent to public API Endpoint functions
+     * @param {string} method - The string containing the method to use endpoint map
+     * @param {object} options - The options object for the request
+     */
+    _validateApiRequest(endpoint, method, options = {}) {
+        if (!(typeof method === 'string') || !(method instanceof String)) {
+            throw new Error('method must be a string');
+        }
+
+        if (!endpoint.includes(method)) {
+            throw new Error(
+                `method may only contain the following: ${endpoint.join(
+                    ', '
+                )}`
+            );
+        }
+
+        const isOptionsObject = options === Object(options) && !Array.isArray(options);
+
+        const values = Object.keys(options).filter(
+            (value) => !HUDU_REQUEST_PROPERTIES.includes(value)
+        );
+
+        if (!isOptionsObject) {
+            throw new Error('options must be an object');
+        }
+
+        if (values.length > 0) {
+            throw new Error(
+                `options may only contain the following: ${HUDU_CONFIG_PROPERTIES.join(
+                    ', '
+                )}`
+            );
+        }
+
+        if (!options.method) {
+            throw new Error('options must contain method value');
+        }
+
+        if (!options.resource) {
+            throw new Error('options must contain resource value');
+        }
+
+        if (options.method == 'post' && !options.body) {
+            throw new Error(
+                'options body value must be defined when method value is post'
+            );
+        }
+
+        if (options.method == 'put' && !options.body) {
+            throw new Error(
+                'options body value must be defined when method value is put'
+            );
+        }
+
+        return [method, options];
+    }
+
+    /**
+     * Validate the parameters for _sendApiRequest()
      * @private
-     * @param {object} options - The options object for the request sent to _sendApiRequest()
+     * @param {object} options - The options object for the request
      * @returns {object}
      */
-    _validateApiRequestOptions(options = {}) {
-        const isObject = options === Object(options) && !Array.isArray(options);
+    _validateSendApiRequest(options = {}) {
+        const isOptionsObject = options === Object(options) && !Array.isArray(options);
 
-        if (!isObject) {
+        if (!isOptionsObject) {
             throw new Error('options must be an object');
         }
 
@@ -566,29 +641,29 @@ class Hudu {
 
         if (values.length > 0) {
             throw new Error(
-                `reqOptions may only contain the following: ${HUDU_CONFIG_PROPERTIES.join(
+                `options may only contain the following: ${HUDU_CONFIG_PROPERTIES.join(
                     ', '
                 )}`
             );
         }
 
         if (!options.method) {
-            throw new Error('reqOptions must contain method value');
+            throw new Error('options must contain method value');
         }
 
         if (!options.resource) {
-            throw new Error('reqOptions must contain resource value');
+            throw new Error('options must contain resource value');
         }
 
         if (options.method == 'post' && !options.body) {
             throw new Error(
-                'reqOptions body value must be defined when method value is post'
+                'options body value must be defined when method value is post'
             );
         }
 
         if (options.method == 'put' && !options.body) {
             throw new Error(
-                'reqOptions body value must be defined when method value is put'
+                'options body value must be defined when method value is put'
             );
         }
 
@@ -607,7 +682,7 @@ class Hudu {
      */
     _sendApiRequest(options = {}) {
         const self = this;
-        const validReqOptions = this._validateApiRequestOptions(options);
+        const validReqOptions = this._validateSendApiRequest(options);
 
         return new Promise(function (resolve, reject) {
             let queryString = '';
@@ -676,9 +751,11 @@ class Hudu {
      * @returns {Promise}
      */
     activity_logs(method = '', options = {}) {
-        return this._apiEndpoints.activity_logs[method]
+        const validApiOptions = this._validateApiRequest(this._apiEndpoints.activity_logs, method, options);
+
+        return this._apiEndpoints.activity_logs[validApiOptions['method']]
             ? this._sendApiRequest(
-                  this._apiEndpoints.activity_logs[method](options)
+                  this._apiEndpoints.activity_logs[validApiOptions['method']](validApiOptions['options'])
               )
             : reject();
     }

@@ -169,6 +169,96 @@ describe('Hudu', () => {
                     });
                 }).to.not.throw();
             });
+
+            it('should only accept an object for params if supplied', () => {
+                expect(() => {
+                    const huduInst = new Hudu({
+                        host: 'example.com',
+                        key: 'abcdefghijklmnopqrstuvwxyz',
+                    });
+
+                    huduInst._sendApiRequest({
+                        method: 'get',
+                        resource: 'companies',
+                        params: 'value',
+                    });
+                }).to.throw(/config.params must be an object/);
+
+                expect(() => {
+                    const huduInst = new Hudu({
+                        host: 'example.com',
+                        key: 'abcdefghijklmnopqrstuvwxyz',
+                    });
+
+                    huduInst._sendApiRequest({
+                        method: 'get',
+                        resource: 'companies',
+                    });
+                }).to.not.throw();
+
+                expect(() => {
+                    const huduInst = new Hudu({
+                        host: 'example.com',
+                        key: 'abcdefghijklmnopqrstuvwxyz',
+                    });
+
+                    huduInst._sendApiRequest({
+                        method: 'get',
+                        resource: 'companies',
+                        params: {},
+                    });
+                }).to.not.throw();
+            });
+
+            it('should only accept an object for body if supplied', () => {
+                expect(() => {
+                    const huduInst = new Hudu({
+                        host: 'example.com',
+                        key: 'abcdefghijklmnopqrstuvwxyz',
+                    });
+
+                    huduInst._sendApiRequest({
+                        method: 'get',
+                        resource: 'companies',
+                        body: 'value',
+                    });
+                }).to.throw(/config.body must be an object/);
+
+                expect(() => {
+                    const huduInst = new Hudu({
+                        host: 'example.com',
+                        key: 'abcdefghijklmnopqrstuvwxyz',
+                    });
+
+                    huduInst._sendApiRequest({
+                        method: 'get',
+                        resource: 'companies',
+                    });
+                }).to.not.throw();
+
+                expect(() => {
+                    const huduInst = new Hudu({
+                        host: 'example.com',
+                        key: 'abcdefghijklmnopqrstuvwxyz',
+                    });
+
+                    huduInst._sendApiRequest({
+                        method: 'get',
+                        resource: 'companies',
+                        body: {},
+                    });
+                }).to.not.throw();
+            });
+        });
+    });
+
+    describe('activity_logs()', () => {
+        describe('method', () => {
+
+        });
+
+        describe('options', () => {
+
         });
     });
 });
