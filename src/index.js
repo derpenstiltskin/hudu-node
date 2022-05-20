@@ -1,673 +1,44 @@
 'use strict';
 
 import https from 'https';
-
-const HUDU_API_PORT = 443;
-const HUDU_API_BASE_PATH = '/api/v1/';
-const HUDU_CONFIG_PROPERTIES = ['host', 'key', 'port'];
-const HUDU_REQUEST_PROPERTIES = ['method', 'resource', 'params', 'body'];
+import resources from './resources.js';
 
 /** Class representing a Hudu API wrapper instance */
 class Hudu {
     /**
      * Creates a Hudu API wrapper instance
-     * @param {object} config  - The configuration object to connect to a Hudu API instance
+     * @param {object} options  - The configuration object to connect to a Hudu API instance
      * @param {string} config.host - The string containing the hostname for a Hudu API instance
      * @param {string} config.key - The string containing the API key for a Hudu API instance
      * @param {number} [config.port] - The optional number containing a port number if the Hudu API is not running on TCP port 443
      */
-    constructor(config = {}) {
-        const validApiOptions = this._validateApiConfig(config);
+    constructor(options = {}) {
+        this._HUDU_API_PORT = 443;
+        this._HUDU_API_BASE_PATH = '/api/v1';
+        this._HUDU_CONFIG_PROPERTIES = ['host', 'key', 'port'];
+        this._HUDU_REQUEST_PROPERTIES = ['method', 'resource', 'params', 'body'];
 
-        /**
-         * Hudu API configuration object
-         * @private
-         * @type {object}
-         */
-        this._api = {
-            host: validApiOptions.host,
-            key: validApiOptions.key,
-            port: validApiOptions.port || HUDU_API_PORT,
+        this._config = {
+            host: options.host,
+            key: options.key,
+            port: options.port || this._HUDU_API_PORT,
         };
 
-        /**
-         * Hudu API endpoint map
-         * @private
-         * @type {object}
-         */
-        this._apiEndpoints = {
-            activity_logs: {
-                get: (options = {}) => {
-                    return {
-                        method: 'get',
-                        resource: '/activity_logs',
-                        params: options.params ? options.params : {},
-                        body: null,
-                    };
-                },
-            },
-            api_info: {
-                get: (options = {}) => {
-                    return {
-                        method: 'get',
-                        resource: '/api_info',
-                        params: options.params ? options.params : {},
-                        body: null,
-                    };
-                },
-            },
-            articles: {
-                get: (options = {}) => {
-                    return {
-                        method: 'get',
-                        resource: `/articles${
-                            options.id ? `/${options.id}` : ''
-                        }`,
-                        params: options.params ? options.params : {},
-                        body: null,
-                    };
-                },
-                create: (options = {}) => {
-                    return {
-                        method: 'post',
-                        resource: '/articles',
-                        params: null,
-                        body: options.body ? options.body : {},
-                    };
-                },
-                update: (options = {}) => {
-                    return {
-                        method: 'put',
-                        resource: `/articles${
-                            options.id ? `/${options.id}` : ''
-                        }`,
-                        params: null,
-                        body: options.body ? options.body : {},
-                    };
-                },
-                delete: (options = {}) => {
-                    return {
-                        method: 'delete',
-                        resource: `/articles${
-                            options.id ? `/${options.id}` : ''
-                        }`,
-                        params: null,
-                        body: null,
-                    };
-                },
-                archive: (options = {}) => {
-                    return {
-                        method: 'put',
-                        resource: `/articles${
-                            options.id ? `/${options.id}` : ''
-                        }/archive`,
-                        params: null,
-                        body: null,
-                    };
-                },
-                unarchive: (options = {}) => {
-                    return {
-                        method: 'put',
-                        resource: `/articles${
-                            options.id ? `/${options.id}` : ''
-                        }/unarchive`,
-                        params: null,
-                        body: null,
-                    };
-                },
-            },
-            asset_layouts: {
-                get: (options = {}) => {
-                    return {
-                        method: 'get',
-                        resource: `/asset_layouts${
-                            options.id ? `/${options.id}` : ''
-                        }`,
-                        params: options.params ? options.params : {},
-                        body: null,
-                    };
-                },
-                create: (options = {}) => {
-                    return {
-                        method: 'post',
-                        resource: '/asset_layouts',
-                        params: null,
-                        body: options.body ? options.body : {},
-                    };
-                },
-                update: (options = {}) => {
-                    return {
-                        method: 'put',
-                        resource: `/asset_layouts${
-                            options.id ? `/${options.id}` : ''
-                        }`,
-                        params: null,
-                        body: options.body ? options.body : {},
-                    };
-                },
-            },
-            asset_passwords: {
-                get: (options = {}) => {
-                    return {
-                        method: 'get',
-                        resource: `/asset_passwords${
-                            options.id ? `/${options.id}` : ''
-                        }`,
-                        params: options.params ? options.params : {},
-                        body: null,
-                    };
-                },
-                create: (options = {}) => {
-                    return {
-                        method: 'post',
-                        resource: '/asset_passwords',
-                        params: null,
-                        body: options.body ? options.body : {},
-                    };
-                },
-                update: (options = {}) => {
-                    return {
-                        method: 'put',
-                        resource: `/asset_passwords${
-                            options.id ? `/${options.id}` : ''
-                        }`,
-                        params: null,
-                        body: options.body ? options.body : {},
-                    };
-                },
-                delete: (options = {}) => {
-                    return {
-                        method: 'delete',
-                        resource: `/asset_passwords${
-                            options.id ? `/${options.id}` : ''
-                        }`,
-                        params: null,
-                        body: null,
-                    };
-                },
-                archive: (options = {}) => {
-                    return {
-                        method: 'put',
-                        resource: `/asset_passwords${
-                            options.id ? `/${options.id}` : ''
-                        }/archive`,
-                        params: null,
-                        body: null,
-                    };
-                },
-                unarchive: (options = {}) => {
-                    return {
-                        method: 'put',
-                        resource: `/asset_passwords${
-                            options.id ? `/${options.id}` : ''
-                        }/unarchive`,
-                        params: null,
-                        body: null,
-                    };
-                },
-            },
-            assets: {
-                get: (options = {}) => {
-                    return {
-                        method: 'get',
-                        resource: `/assets${
-                            options.id ? `/${options.id}` : ''
-                        }`,
-                        params: options.params ? options.params : {},
-                        body: null,
-                    };
-                },
-                getCompanyAssets: (options = {}) => {
-                    return {
-                        method: 'get',
-                        resource: `/companies${
-                            options.company_id
-                                ? `/${options.company_id}/assets`
-                                : '/assets'
-                        }`,
-                        params: options.params ? options.params : {},
-                        body: null,
-                    };
-                },
-                create: (options = {}) => {
-                    return {
-                        method: 'post',
-                        resource: `/companies${
-                            options.company_id ? `/${options.company_id}` : ''
-                        }/assets`,
-                        params: null,
-                        body: options.body ? options.body : {},
-                    };
-                },
-                update: (options = {}) => {
-                    return {
-                        method: 'put',
-                        resource: `/companies${
-                            options.company_id ? `/${options.company_id}` : ''
-                        }/assets${options.id ? `/${options.id}` : ''}`,
-                        params: null,
-                        body: options.body ? options.body : {},
-                    };
-                },
-                delete: (options = {}) => {
-                    return {
-                        method: 'delete',
-                        resource: `/companies${
-                            options.company_id ? `/${options.company_id}` : ''
-                        }/assets${options.id ? `/${options.id}` : ''}`,
-                        params: null,
-                        body: null,
-                    };
-                },
-                archive: (options = {}) => {
-                    return {
-                        method: 'put',
-                        resource: `/companies${
-                            options.company_id ? `/${options.company_id}` : ''
-                        }/assets${options.id ? `/${options.id}` : ''}/archive`,
-                        params: null,
-                        body: null,
-                    };
-                },
-                unarchive: (options = {}) => {
-                    return {
-                        method: 'put',
-                        resource: `/companies${
-                            options.company_id ? `/${options.company_id}` : ''
-                        }/assets${
-                            options.id ? `/${options.id}` : ''
-                        }/unarchive`,
-                        params: null,
-                        body: null,
-                    };
-                },
-            },
-            companies: {
-                get: (options = {}) => {
-                    return {
-                        method: 'get',
-                        resource: `/companies${
-                            options.id ? `/${options.id}` : ''
-                        }`,
-                        params: options.params ? options.params : {},
-                        body: null,
-                    };
-                },
-                create: (options = {}) => {
-                    return {
-                        method: 'post',
-                        resource: '/companies',
-                        params: null,
-                        body: options.body ? options.body : {},
-                    };
-                },
-                update: (options = {}) => {
-                    return {
-                        method: 'put',
-                        resource: `/companies${
-                            options.id ? `/${options.id}` : ''
-                        }`,
-                        params: null,
-                        body: options.body ? options.body : {},
-                    };
-                },
-                delete: (options = {}) => {
-                    return {
-                        method: 'delete',
-                        resource: `/companies${
-                            options.id ? `/${options.id}` : ''
-                        }`,
-                        params: null,
-                        body: null,
-                    };
-                },
-                archive: (options = {}) => {
-                    return {
-                        method: 'put',
-                        resource: `/companies${
-                            options.id ? `/${options.id}` : ''
-                        }/archive`,
-                        params: null,
-                        body: null,
-                    };
-                },
-                unarchive: (options = {}) => {
-                    return {
-                        method: 'put',
-                        resource: `/companies${
-                            options.id ? `/${options.id}` : ''
-                        }/unarchive`,
-                        params: null,
-                        body: null,
-                    };
-                },
-            },
-            expirations: {
-                get: (options = {}) => {
-                    return {
-                        method: 'get',
-                        resource: '/expirations',
-                        params: options.params ? options.params : {},
-                        body: null,
-                    };
-                },
-            },
-            folders: {
-                get: (options = {}) => {
-                    return {
-                        method: 'get',
-                        resource: `/folders${
-                            options.id ? `/${options.id}` : ''
-                        }`,
-                        params: options.params ? options.params : {},
-                        body: null,
-                    };
-                },
-                create: (options = {}) => {
-                    return {
-                        method: 'post',
-                        resource: '/folders',
-                        params: null,
-                        body: options.body ? options.body : {},
-                    };
-                },
-                update: (options = {}) => {
-                    return {
-                        method: 'put',
-                        resource: `/folders${
-                            options.id ? `/${options.id}` : ''
-                        }`,
-                        params: null,
-                        body: options.body ? options.body : {},
-                    };
-                },
-                delete: (options = {}) => {
-                    return {
-                        method: 'delete',
-                        resource: `/folders${
-                            options.id ? `/${options.id}` : ''
-                        }`,
-                        params: null,
-                        body: null,
-                    };
-                },
-            },
-            magic_dash: {
-                get: (options = {}) => {
-                    return {
-                        method: 'get',
-                        resource: '/magic_dash',
-                        params: options.params ? options.params : {},
-                        body: null,
-                    };
-                },
-                create: (options = {}) => {
-                    return {
-                        method: 'post',
-                        resource: '/magic_dash',
-                        params: null,
-                        body: options.body ? options.body : {},
-                    };
-                },
-                update: (options = {}) => {
-                    return {
-                        method: 'post',
-                        resource: '/magic_dash',
-                        params: null,
-                        body: options.body ? options.body : {},
-                    };
-                },
-                delete: (options = {}) => {
-                    return {
-                        method: 'delete',
-                        resource: `/magic_dash${
-                            options.id ? `/${options.id}` : ''
-                        }`,
-                        params: null,
-                        body: options.body ? options.body : {},
-                    };
-                },
-            },
-            procedures: {
-                get: (options = {}) => {
-                    return {
-                        method: 'get',
-                        resource: `/procedures${
-                            options.id ? `/${options.id}` : ''
-                        }`,
-                        params: options.params ? options.params : {},
-                        body: null,
-                    };
-                },
-            },
-            relations: {
-                get: (options = {}) => {
-                    return {
-                        method: 'get',
-                        resource: '/relations',
-                        params: options.params ? options.params : {},
-                        body: null,
-                    };
-                },
-                create: (options = {}) => {
-                    return {
-                        method: 'post',
-                        resource: '/relations',
-                        params: null,
-                        body: options.body ? options.body : {},
-                    };
-                },
-                delete: (options = {}) => {
-                    return {
-                        method: 'delete',
-                        resource: `/relations${
-                            options.id ? `/${options.id}` : ''
-                        }`,
-                        params: null,
-                        body: options.body ? options.body : {},
-                    };
-                },
-            },
-            websites: {
-                get: (options = {}) => {
-                    return {
-                        method: 'get',
-                        resource: `/websites${
-                            options.id ? `/${options.id}` : ''
-                        }`,
-                        params: options.params ? options.params : {},
-                        body: null,
-                    };
-                },
-                create: (options = {}) => {
-                    return {
-                        method: 'post',
-                        resource: '/websites',
-                        params: null,
-                        body: options.body ? options.body : {},
-                    };
-                },
-                update: (options = {}) => {
-                    return {
-                        method: 'put',
-                        resource: `/websites${
-                            options.id ? `/${options.id}` : ''
-                        }`,
-                        params: null,
-                        body: options.body ? options.body : {},
-                    };
-                },
-                delete: (options = {}) => {
-                    return {
-                        method: 'delete',
-                        resource: `/websites${
-                            options.id ? `/${options.id}` : ''
-                        }`,
-                        params: null,
-                        body: null,
-                    };
-                },
-            },
-        };
+        for (const [key, value] of Object.entries(resources)) {
+            this[key] = new value(this);
+        }
+    };
+
+    _isValidApiRequest(req = {}) {
+        return new Promise(function (resolve, reject) {
+            resolve(true);
+        });
     }
 
-    /**
-     * Validate the config object for the Hudu constructor
-     * @private
-     * @param {object} config - The configuration object to connect to the Hudu API instance sent to Hudu()
-     * @returns {object}
-     */
-    _validateApiConfig(config = {}) {
-        const isObject = config === Object(config) && !Array.isArray(config);
-
-        if (!isObject) {
-            throw new Error('config must be an object');
-        }
-
-        const values = Object.keys(config).filter(
-            (value) => !HUDU_CONFIG_PROPERTIES.includes(value)
-        );
-
-        if (values.length > 0) {
-            throw new Error(
-                `config may only contain the following: ${HUDU_CONFIG_PROPERTIES.join(
-                    ', '
-                )}`
-            );
-        }
-
-        if (!config.host) {
-            throw new Error('config must contain host value');
-        }
-
-        if (!config.key) {
-            throw new Error('config must contain key value');
-        }
-
-        if (config.params) {
-            const isParamsObject = config.params === Object(config.params) && !Array.isArray(config.params);
-
-            if (!isParamsObject) {
-                throw new Error('config.params must be an object');
-            }
-        }
-
-        if (config.body) {
-            const isBodyObject = config.body === Object(config.body) && !Array.isArray(config.body);
-
-            if (!isBodyObject) {
-                throw new Error('config.body must be an object');
-            }
-        }
-
-        return config;
-    }
-
-    /**
-     * Validate the parameters sent to public API Endpoint functions
-     * @param {string} method - The string containing the method to use endpoint map
-     * @param {object} options - The options object for the request
-     */
-    _validateApiRequest(endpoint, method, options = {}) {
-        if (!(typeof method === 'string') || !(method instanceof String)) {
-            throw new Error('method must be a string');
-        }
-
-        if (!endpoint.includes(method)) {
-            throw new Error(
-                `method may only contain the following: ${endpoint.join(
-                    ', '
-                )}`
-            );
-        }
-
-        const isOptionsObject = options === Object(options) && !Array.isArray(options);
-
-        const values = Object.keys(options).filter(
-            (value) => !HUDU_REQUEST_PROPERTIES.includes(value)
-        );
-
-        if (!isOptionsObject) {
-            throw new Error('options must be an object');
-        }
-
-        if (values.length > 0) {
-            throw new Error(
-                `options may only contain the following: ${HUDU_CONFIG_PROPERTIES.join(
-                    ', '
-                )}`
-            );
-        }
-
-        if (!options.method) {
-            throw new Error('options must contain method value');
-        }
-
-        if (!options.resource) {
-            throw new Error('options must contain resource value');
-        }
-
-        if (options.method == 'post' && !options.body) {
-            throw new Error(
-                'options body value must be defined when method value is post'
-            );
-        }
-
-        if (options.method == 'put' && !options.body) {
-            throw new Error(
-                'options body value must be defined when method value is put'
-            );
-        }
-
-        return [method, options];
-    }
-
-    /**
-     * Validate the parameters for _sendApiRequest()
-     * @private
-     * @param {object} options - The options object for the request
-     * @returns {object}
-     */
-    _validateSendApiRequest(options = {}) {
-        const isOptionsObject = options === Object(options) && !Array.isArray(options);
-
-        if (!isOptionsObject) {
-            throw new Error('options must be an object');
-        }
-
-        const values = Object.keys(options).filter(
-            (value) => !HUDU_REQUEST_PROPERTIES.includes(value)
-        );
-
-        if (values.length > 0) {
-            throw new Error(
-                `options may only contain the following: ${HUDU_CONFIG_PROPERTIES.join(
-                    ', '
-                )}`
-            );
-        }
-
-        if (!options.method) {
-            throw new Error('options must contain method value');
-        }
-
-        if (!options.resource) {
-            throw new Error('options must contain resource value');
-        }
-
-        if (options.method == 'post' && !options.body) {
-            throw new Error(
-                'options body value must be defined when method value is post'
-            );
-        }
-
-        if (options.method == 'put' && !options.body) {
-            throw new Error(
-                'options body value must be defined when method value is put'
-            );
-        }
-
-        return options;
+    _isValidApiResourceRequest(req = {}) {
+        return new Promise(function (resolve, reject) {
+            resolve(true);
+        });
     }
 
     /**
@@ -682,14 +53,17 @@ class Hudu {
      */
     _sendApiRequest(options = {}) {
         const self = this;
-        const validReqOptions = this._validateSendApiRequest(options);
 
         return new Promise(function (resolve, reject) {
+            if (!self._isValidApiRequest(null)) {
+                reject();
+            }
+
             let queryString = '';
 
-            if (validReqOptions.params) {
-                queryString = Object.keys(validReqOptions.params)
-                    .map((key) => key + '=' + validReqOptions[key])
+            if (options.params) {
+                queryString = Object.keys(options.params)
+                    .map((key) => key + '=' + options[key])
                     .join('&');
 
                 if (queryString.length > 0) {
@@ -697,18 +71,18 @@ class Hudu {
                 }
             }
 
-            const reqConfig = {
-                host: self._api.host,
-                path: `${HUDU_API_BASE_PATH}${validReqOptions.resource}${queryString}`,
-                port: self._api.port || HUDU_API_PORT,
-                method: validReqOptions.method,
+            const reqOptions = {
+                host: self._config.host,
+                path: `${self._HUDU_API_BASE_PATH}${options.resource}${queryString}`,
+                port: self._config.port,
+                method: options.method,
                 headers: {
-                    'x-api-key': self._api.key,
+                    'x-api-key': self._config.key,
                     'Content-Type': 'application/json',
                 },
             };
 
-            const req = https.request(reqConfig, function (res) {
+            const req = https.request(reqOptions, function (res) {
                 if (res.statusCode < 200 || res.statusCode >= 300) {
                     return reject(
                         new Error(`HTTP Status Code: ${res.statusCode}`)
@@ -736,187 +110,13 @@ class Hudu {
                 reject(err);
             });
 
-            if (validReqOptions.body) {
-                req.write(validReqOptions.body);
+            if (options.body) {
+                req.write(options.body);
             }
 
             req.end();
         });
-    }
-
-    /**
-     * Sends API request to the Hudu activity_logs endpoint
-     * @param {string} method - String containing type of API request
-     * @param {object} options - Configuration object for the API request
-     * @returns {Promise}
-     */
-    activity_logs(method = '', options = {}) {
-        const validApiOptions = this._validateApiRequest(this._apiEndpoints.activity_logs, method, options);
-
-        return this._apiEndpoints.activity_logs[validApiOptions['method']]
-            ? this._sendApiRequest(
-                  this._apiEndpoints.activity_logs[validApiOptions['method']](validApiOptions['options'])
-              )
-            : reject();
-    }
-
-    /**
-     * Sends API request to the Hudu api_info endpoint
-     * @param {string} method - String containing type of API request
-     * @param {object} options - Configuration object for the API request
-     * @returns {Promise}
-     */
-    api_info(method = '', options = {}) {
-        return this._apiEndpoints.api_info[method]
-            ? this._sendApiRequest(this._apiEndpoints.api_info[method](options))
-            : reject();
-    }
-
-    /**
-     * Sends API request to the Hudu articles endpoint
-     * @param {string} method - String containing type of API request
-     * @param {object} options - Configuration object for the API request
-     * @returns {Promise}
-     */
-    articles(method = '', options = {}) {
-        return this._apiEndpoints.articles[method]
-            ? this._sendApiRequest(this._apiEndpoints.articles[method](options))
-            : reject();
-    }
-
-    /**
-     * Sends API request to the Hudu asset_layouts endpoint
-     * @param {string} method - String containing type of API request
-     * @param {object} options - Configuration object for the API request
-     * @returns {Promise}
-     */
-    asset_layouts(method = '', options = {}) {
-        return this._apiEndpoints.asset_layouts[method]
-            ? this._sendApiRequest(
-                  this._apiEndpoints.asset_layouts[method](options)
-              )
-            : reject();
-    }
-
-    /**
-     * Sends API request to the Hudu asset_passwords endpoint
-     * @param {string} method - String containing type of API request
-     * @param {object} options - Configuration object for the API request
-     * @returns {Promise}
-     */
-    asset_passwords(method = '', options = {}) {
-        return this._apiEndpoints.asset_passwords[method]
-            ? this._sendApiRequest(
-                  this._apiEndpoints.asset_passwords[method](options)
-              )
-            : reject();
-    }
-
-    /**
-     * Sends API request to the Hudu assets endpoint
-     * @param {string} method - String containing type of API request
-     * @param {object} options - Configuration object for the API request
-     * @returns {Promise}
-     */
-    assets(method = '', options = {}) {
-        return this._apiEndpoints.assets[method]
-            ? this._sendApiRequest(this._apiEndpoints.assets[method](options))
-            : reject();
-    }
-
-    /**
-     * Sends API request to the Hudu companies endpoint
-     * @param {string} method - String containing type of API request
-     * @param {object} options - Configuration object for the API request
-     * @returns {Promise}
-     */
-    companies(method = '', options = {}) {
-        return this._apiEndpoints.companies[method]
-            ? this._sendApiRequest(
-                  this._apiEndpoints.companies[method](options)
-              )
-            : reject();
-    }
-
-    /**
-     * Sends API request to the Hudu expirations endpoint
-     * @param {string} method - String containing type of API request
-     * @param {object} options - Configuration object for the API request
-     * @returns {Promise}
-     */
-    expirations(method = '', options = {}) {
-        return this._apiEndpoints.expirations[method]
-            ? this._sendApiRequest(
-                  this._apiEndpoints.expirations[method](options)
-              )
-            : reject();
-    }
-
-    /**
-     * Sends API request to the Hudu folders endpoint
-     * @param {string} method - String containing type of API request
-     * @param {object} options - Configuration object for the API request
-     * @returns {Promise}
-     */
-    folders(method = '', options = {}) {
-        return this._apiEndpoints.folders[method]
-            ? this._sendApiRequest(this._apiEndpoints.folders[method](options))
-            : reject();
-    }
-
-    /**
-     * Sends API request to the Hudu magic_dash endpoint
-     * @param {string} method - String containing type of API request
-     * @param {object} options - Configuration object for the API request
-     * @returns {Promise}
-     */
-    magic_dash(method = '', options = {}) {
-        return this._apiEndpoints.magic_dash[method]
-            ? this._sendApiRequest(
-                  this._apiEndpoints.magic_dash[method](options)
-              )
-            : reject();
-    }
-
-    /**
-     * Sends API request to the Hudu procedures endpoint
-     * @param {string} method - String containing type of API request
-     * @param {object} options - Configuration object for the API request
-     * @returns {Promise}
-     */
-    procedures(method = '', options = {}) {
-        return this._apiEndpoints.procedures[method]
-            ? this._sendApiRequest(
-                  this._apiEndpoints.procedures[method](options)
-              )
-            : reject();
-    }
-
-    /**
-     * Sends API request to the Hudu relations endpoint
-     * @param {string} method - String containing type of API request
-     * @param {object} options - Configuration object for the API request
-     * @returns {Promise}
-     */
-    relations(method = '', options = {}) {
-        return this._apiEndpoints.relations[method]
-            ? this._sendApiRequest(
-                  this._apiEndpoints.relations[method](options)
-              )
-            : reject();
-    }
-
-    /**
-     * Sends API request to the Hudu websites endpoint
-     * @param {string} method - String containing type of API request
-     * @param {object} options - Configuration object for the API request
-     * @returns {Promise}
-     */
-    websites(method = '', options = {}) {
-        return this._apiEndpoints.websites[method]
-            ? this._sendApiRequest(this._apiEndpoints.websites[method](options))
-            : reject();
-    }
+    };
 }
 
 export default Hudu;
